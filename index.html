@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>CPM1 Manager - Gerenciador de Contas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #fff;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 0.9em;
+        }
+
+        /* Cards */
+        .card {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .card h3 {
+            margin-bottom: 15px;
+            color: #ffd700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Forms */
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 10px;
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+            background: rgba(0,0,0,0.5);
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        button.primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        button.primary:hover {
+            transform: scale(1.02);
+            box-shadow: 0 5px 20px rgba(102,126,234,0.4);
+        }
+
+        button.danger {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        button.success {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        button.warning {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: #333;
+        }
+
+        /* Info Panel */
+        .info-panel {
+            background: rgba(0,0,0,0.5);
+            border-radius: 15px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: bold;
+            color: #ffd700;
+        }
+
+        .info-value {
+            color: #4facfe;
+        }
+
+        /* Alert */
+        .alert {
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            display: none;
+        }
+
+        .alert.success {
+            background: rgba(76, 175, 80, 0.3);
+            border: 1px solid #4caf50;
+            color: #4caf50;
+        }
+
+        .alert.error {
+            background: rgba(244, 67, 54, 0.3);
+            border: 1px solid #f44336;
+            color: #f44336;
+        }
+
+        .alert.info {
+            background: rgba(33, 150, 243, 0.3);
+            border: 1px solid #2196f3;
+            color: #2196f3;
+        }
+
+        /* Menu */
+        .menu-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .menu-btn {
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 15px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .menu-btn:hover {
+            background: rgba(102,126,234,0.3);
+            transform: scale(1.05);
+        }
+
+        .menu-btn.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        /* Loading */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Hide/Show */
+        .hidden {
+            display: none;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.8em;
+            opacity: 0.7;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏎️ CPM1 MANAGER</h1>
+            <p>Gerenciador de Contas - @abdulazizruziboev</p>
+        </div>
+
+        <div id="alert" class="alert"></div>
+
+        <!-- Menu Principal -->
+        <div class="menu-buttons" id="mainMenu">
+            <div class="menu-btn" onclick="showSection('login')">
+                🔐 Login
+            </div>
+            <div class="menu-btn" onclick="showSection('register')">
+                📝 Registrar
+            </div>
+        </div>
+
+        <!-- Seção de Login -->
+        <div id="loginSection" class="card hidden">
+            <h3>🔐 Login na Conta</h3>
+            <div class="alert info" style="display: block; margin-bottom: 15px;">
+                ⚠️ IMPORTANTE: Faça logout do jogo antes de usar!
+            </div>
+            <div class="input-group">
+                <label>📧 Email</label>
+                <input type="email" id="loginEmail" placeholder="seu@email.com">
+            </div>
+            <div class="input-group">
+                <label>🔒 Senha</label>
+                <input type="password" id="loginPassword" placeholder="********">
+            </div>
+            <button class="primary" onclick="login()">Entrar</button>
+            <button onclick="showSection('main')" style="margin-top: 10px; background: rgba(255,255,255,0.1);">Voltar</button>
+        </div>
+
+        <!-- Seção de Registro -->
+        <div id="registerSection" class="card hidden">
+            <h3>📝 Criar Nova Conta</h3>
+            <div class="input-group">
+                <label>📧 Email</label>
+                <input type="email" id="regEmail" placeholder="seu@email.com">
+            </div>
+            <div class="input-group">
+                <label>🔒 Senha</label>
+                <input type="password" id="regPassword" placeholder="********">
+            </div>
+            <button class="success" onclick="register()">Criar Conta</button>
+            <button onclick="showSection('main')" style="margin-top: 10px; background: rgba(255,255,255,0.1);">Voltar</button>
+        </div>
+
+        <!-- Painel de Serviços (aparece após login) -->
+        <div id="servicesSection" class="hidden">
+            <div class="card">
+                <h3>👤 Informações da Conta</h3>
+                <div class="info-panel">
+                    <div class="info-row">
+                        <span class="info-label">Email:</span>
+                        <span class="info-value" id="infoEmail">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Nome:</span>
+                        <span class="info-value" id="infoName">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Local ID:</span>
+                        <span class="info-value" id="infoLocalId">-</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">💰 Money:</span>
+                        <span class="info-value" id="infoMoney">0</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">🪙 Coin:</span>
+                        <span class="info-value" id="infoCoin">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>⚙️ Serviços Disponíveis</h3>
+                <button class="primary" onclick="applyKingRank()">👑 Aplicar King Rank</button>
+                <button class="warning" onclick="showChangeEmail()" style="margin-top: 10px;">✉️ Alterar Email</button>
+                <button class="warning" onclick="showChangePassword()" style="margin-top: 10px;">🔑 Alterar Senha</button>
+                <button class="danger" onclick="deleteAccount()" style="margin-top: 10px;">🗑️ Deletar Conta</button>
+                <button onclick="logout()" style="margin-top: 10px; background: rgba(255,255,255,0.1);">🚪 Sair</button>
+            </div>
+        </div>
+
+        <!-- Modal Alterar Email -->
+        <div id="changeEmailModal" class="card hidden" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; max-width: 90%; width: 400px;">
+            <h3>✉️ Alterar Email</h3>
+            <div class="input-group">
+                <label>Email Atual</label>
+                <input type="email" id="oldEmail" placeholder="email atual">
+            </div>
+            <div class="input-group">
+                <label>Novo Email</label>
+                <input type="email" id="newEmail" placeholder="novo email">
+            </div>
+            <div class="input-group">
+                <label>Senha</label>
+                <input type="password" id="emailPassword" placeholder="sua senha">
+            </div>
+            <button class="primary" onclick="changeEmail()">Confirmar</button>
+            <button onclick="closeModal('changeEmailModal')" style="margin-top: 10px;">Cancelar</button>
+        </div>
+
+        <!-- Modal Alterar Senha -->
+        <div id="changePasswordModal" class="card hidden" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000; max-width: 90%; width: 400px;">
+            <h3>🔑 Alterar Senha</h3>
+            <div class="input-group">
+                <label>Senha Atual</label>
+                <input type="password" id="oldPass" placeholder="senha atual">
+            </div>
+            <div class="input-group">
+                <label>Nova Senha</label>
+                <input type="password" id="newPass" placeholder="nova senha">
+            </div>
+            <button class="primary" onclick="changePassword()">Confirmar</button>
+            <button onclick="closeModal('changePasswordModal')" style="margin-top: 10px;">Cancelar</button>
+        </div>
+
+        <!-- Loading -->
+        <div id="loading" class="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px;">Processando...</p>
+        </div>
+
+        <div class="footer">
+            <p>© 2024 CPM1 Manager | Desenvolvido por @abdulazizruziboev</p>
+        </div>
+    </div>
+
+    <script>
+        // Configuração
+        const FIREBASE_API_KEY = "AIzaSyBW1ZbMiUeDZHYUO2bY8Bfnf5rRgrQGPTM";
+        const INFO_API = "https://us-central1-cp-multiplayer.cloudfunctions.net/GetPlayerRecords2";
+        const RANK_API = "https://us-central1-cp-multiplayer.cloudfunctions.net/SetUserRating4";
+
+        // Variáveis globais
+        let currentToken = null;
+        let currentEmail = null;
+        let currentPassword = null;
+
+        // Mostrar alerta
+        function showAlert(message, type) {
+            const alert = document.getElementById('alert');
+            alert.className = `alert ${type}`;
+            alert.innerHTML = message;
+            alert.style.display = 'block';
+            setTimeout(() => {
+                alert.style.display = 'none';
+            }, 5000);
+        }
+
+        // Mostrar/Esconder loading
+        function showLoading(show) {
+            document.getElementById('loading').style.display = show ? 'block' : 'none';
+        }
+
+        // Mostrar seção
+        function showSection(section) {
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('registerSection').classList.add('hidden');
+            document.getElementById('servicesSection').classList.add('hidden');
+            
+            if (section === 'login') {
+                document.getElementById('loginSection').classList.remove('hidden');
+            } else if (section === 'register') {
+                document.getElementById('registerSection').classList.remove('hidden');
+            } else if (section === 'services') {
+                document.getElementById('servicesSection').classList.remove('hidden');
+            } else if (section === 'main') {
+                document.getElementById('mainMenu').style.display = 'grid';
+            }
+        }
+
+        // Fechar modal
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        // Registrar conta
+        async function register() {
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+
+            if (!email || !password) {
+                showAlert('Preencha todos os campos!', 'error');
+                return;
+            }
+
+            showLoading(true);
+            const url = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${FIREBASE_API_KEY}`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        returnSecureToken: true
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.idToken) {
+                    showAlert('✅ Conta criada com sucesso!', 'success');
+                    document.getElementById('regEmail').value = '';
+                    document.getElementById('regPassword').value = '';
+                    setTimeout(() => showSection('login'), 1500);
+                } else {
+                    showAlert(`❌ Erro: ${data.error?.message || 'Falha ao criar conta'}`, 'error');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão!', 'error');
+            }
+            showLoading(false);
+        }
+
+        // Login
+        async function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            if (!email || !password) {
+                showAlert('Preencha todos os campos!', 'error');
+                return;
+            }
+
+            showLoading(true);
+            const url = `https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=${FIREBASE_API_KEY}`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: email,
+                        password: password,
+                        returnSecureToken: true
+                    })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok && data.idToken) {
+                    currentToken = data.idToken;
+                    currentEmail = email;
+                    currentPassword = password;
+                    showAlert('✅ Login realizado com sucesso!', 'success');
+                    await loadAccountInfo();
+                    showSection('services');
+                    document.getElementById('mainMenu').style.display = 'none';
+                } else {
+                    showAlert(`❌ Erro: ${data.error?.message || 'Falha no login'}`, 'error');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão!', 'error');
+            }
+            showLoading(false);
+        }
+
+        // Carregar informações da conta
+        async function loadAccountInfo() {
+            if (!currentToken) return;
+
+            try {
+                const response = await fetch(INFO_API, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: JSON.stringify({ data: "null" })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const result = JSON.parse(data.result);
+                    
+                    document.getElementById('infoEmail').textContent = currentEmail;
+                    document.getElementById('infoName').textContent = result.Name || '-';
+                    document.getElementById('infoLocalId').textContent = result.localID || '-';
+                    document.getElementById('infoMoney').textContent = result.money || 0;
+                    document.getElementById('infoCoin').textContent = result.coin || 0;
+                }
+            } catch (error) {
+                console.error('Erro ao carregar informações:', error);
+            }
+        }
+
+        // Aplicar King Rank
+        async function applyKingRank() {
+            if (!currentToken) return;
+            
+            showLoading(true);
+            const ratingData = {
+                data: JSON.stringify({
+                    RatingData: {
+                        t_distance: 2000000000,
+                        time: 2000000000,
+                        speed_banner: 2000000000,
+                        gifts: 2000000000,
+                        treasure: 2000000000,
+                        cars: 2000000000,
+                        race_win: 2000000000,
+                        levels: 2000000000,
+                        drift: 2000000000,
+                        run: 2000000000,
+                        police: 2000000000,
+                        block_post: 2000000000,
+                        real_estate: 2000000000,
+                        fuel: 2000000000,
+                        car_trade: 2000000000,
+                        car_exchange: 2000000000,
+                        burnt_tire: 2000000000,
+                        car_fix: 2000000000,
+                        car_wash: 2000000000,
+                        offroad: 2000000000,
+                        passanger_distance: 2000000000,
+                        reactions: 2000000000,
+                        drift_max: 2000000000,
+                        taxi: 2000000000,
+                        delivery: 2000000000,
+                        cargo: 2000000000,
+                        push_ups: 2000000000,
+                        slicer_cut: 2000000000,
+                        car_collided: 2000000000,
+                        new_type: 2000000000
+                    }
+                })
+            };
+
+            try {
+                const response = await fetch(RANK_API, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${currentToken}`
+                    },
+                    body: JSON.stringify(ratingData)
+                });
+
+                if (response.ok) {
+                    showAlert('👑 King Rank aplicado com sucesso!', 'success');
+                    await loadAccountInfo();
+                } else {
+                    showAlert('❌ Erro ao aplicar King Rank', 'error');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão!', 'error');
+            }
+            showLoading(false);
+        }
+
+        // Mostrar modal de alterar email
+        function showChangeEmail() {
+            document.getElementById('oldEmail').value = currentEmail;
+            document.getElementById('changeEmailModal').classList.remove('hidden');
+        }
+
+        // Alterar email
+        async function changeEmail() {
+            const oldEmail = document.getElementById('oldEmail').value;
+            const newEmail = document.getElementById('newEmail').value;
+            const password = document.getElementById('emailPassword').value;
+
+            if (!oldEmail || !newEmail || !password) {
+                showAlert('Preencha todos os campos!', 'error');
+                return;
+            }
+
+            showLoading(true);
+            
+            // Primeiro, fazer login para obter token atualizado
+            const loginUrl = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${FIREBASE_API_KEY}`;
+            
+            try {
+                const loginRes = await fetch(loginUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: oldEmail,
+                        password: password,
+                        returnSecureToken: true
+                    })
+                });
+                
+                const loginData = await loginRes.json();
+                
+                if (!loginData.idToken) {
+                    showAlert('❌ Falha na autenticação!', 'error');
+                    showLoading(false);
+                    return;
+                }
+                
+                // Atualizar email
+                const updateUrl = `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${FIREBASE_API_KEY}`;
+                const updateRes = await fetch(updateUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        idToken: loginData.idToken,
+                        email: newEmail,
+                        returnSecureToken: true
+                    })
+                });
+                
+                const updateData = await updateRes.json();
+                
+                if (updateData.email) {
+                    showAlert('✅ Email alterado com sucesso!', 'success');
+                    currentEmail = newEmail;
+                    closeModal('changeEmailModal');
+                    document.getElementById('newEmail').value = '';
+                    document.getElementById('emailPassword').value = '';
+                    await loadAccountInfo();
+                } else {
+                    showAlert(`❌ Erro: ${updateData.error?.message}`, 'error');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão!', 'error');
+            }
+            showLoading(false);
+        }
+
+        // Mostrar modal de alterar senha
+        function showChangePassword() {
+            document.getElementById('changePasswordModal').classList.remove('hidden');
+        }
+
+        // Alterar senha
+        async function changePassword() {
+            const oldPass = document.getElementById('oldPass').value;
+            const newPass = document.getElementById('newPass').value;
+
+            if (!oldPass || !newPass) {
+                showAlert('Preencha todos os campos!', 'error');
+                return;
+            }
+
+            showLoading(true);
+            
+            const updateUrl = `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${FIREBASE_API_KEY}`;
+            
+            try {
+                const response = await fetch(updateUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        idToken: currentToken,
+                        password: newPass,
+                        returnSecureToken: true
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.passwordHash) {
+                    showAlert('✅ Senha alterada com sucesso!', 'success');
+                    currentPassword = newPass;
+                    closeModal('changePasswordModal');
+                    document.getElementById('oldPass').value = '';
+                    document.getElementById('newPass').value = '';
+                } else {
+                    showAlert(`❌ Erro: ${data.error?.message}`, 'error');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão!', 'error');
+            }
+            showLoading(false);
+        }
+
+        // Deletar conta
+        async function deleteAccount() {
+            const confirmacao = confirm('⚠️ TEM CERTEZA QUE DESEJA DELETAR ESTA CONTA?\nEsta ação é IRREVERSÍVEL!');
+            
+            if (!confirmacao) return;
+            
+            showLoading(true);
+            
+            const deleteUrl = `https://identitytoolkit.googleapis.com/v1/accounts:delete?key=${FIREBASE_API_KEY}`;
+            
+            try {
+                const response = await fetch(deleteUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        idToken: currentToken
+                    })
+                });
+                
+                if (response.ok) {
+                    showAlert('✅ Conta deletada com sucesso!', 'success');
+                    logout();
+                } else {
+                    const data = await response.json();
+                    showAlert(`❌ Erro: ${data.error?.message}`, 'error');
+                }
+            } catch (error) {
+                showAlert('Erro de conexão!', 'error');
+            }
+            showLoading(false);
+        }
+
+        // Logout
+        function logout() {
+            currentToken = null;
+            currentEmail = null;
+            currentPassword = null;
+            showSection('main');
+            document.getElementById('mainMenu').style.display = 'grid';
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            showAlert('👋 Logout realizado!', 'info');
+        }
+
+        // Inicialização
+        showSection('main');
+    </script>
+</body>
+</html>
